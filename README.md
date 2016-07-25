@@ -10,10 +10,13 @@ LSD. It is only ment to be used to export network-data from a simulation in such
 a manner that it may be analysed and visualised with pajek or other software
 that can make use of the .paj or .net format.  The intention is to provide full
 flexibility and all the options that pajek by Andrej Mrvar
-(http://vlado.fmf.uni-lj.si/pub/networks/pajek/default.htm)
+(http://mrvar.fdv.uni-lj.si/pajek/)
 .paj (and .net) format provides. In addition, the .paj files created may be used
-with PajekToScgAnim by Darko Brvar
-(http://vlado.fmf.uni-lj.si/pub/networks/pajek/svganim/default.htm).
+with PajekToScgAnim by Darko Brvar:
+- PajekToSvgAnim (by Darko Brvar): http://mrvar.fdv.uni-lj.si/pajek/PajekToSvgAnim/PajekToSvgAnim.zip
+- test datasets: http://mrvar.fdv.uni-lj.si/pajek/PajekToSvgAnim/AnimData.zip
+- manual: http://freeweb.siol.net/dbrvar2/PajekToSvgAnim11081.pdf
+
 
 *Usage*:
 Include the pajek.cpp, which will in turn include the header file.
