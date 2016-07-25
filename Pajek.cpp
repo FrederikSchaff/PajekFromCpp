@@ -815,7 +815,6 @@ bool pajek_timeline_close(){
 	                  pajek_arcs_timeStamps_kind[i] /*label*/\
 									);
 					}
-			    pajek_file << pajek_buffer;
 
           pajek_file << pajek_buffer;
 					/* Timestamps */
