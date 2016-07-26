@@ -455,7 +455,7 @@ bool pajek_append (int time, bool final )
 			if (!diffKinds)
 				pajek_file << "*Edges\n";
 			else
-				pajek_file << "*Edges :" << k+1 << " \"" << pajek_edges_kindsOf[k] << "\"\n";
+				pajek_file << "*Edges :" << k+1+pajek_arcs_kindsOf_count << " \"" << pajek_edges_kindsOf[k] << "\"\n";
 																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
 			for (int i = 0; i < pajek_arcs_edges_count; i++){
 				if (pajek_arcs_isEdge[i] && (!diffKinds || strcmp(pajek_edges_kindsOf[k],pajek_arcs_label[i])==0 ) ){
@@ -875,7 +875,7 @@ bool pajek_timeline_close(){
 			if (!diffKinds)
 				pajek_file << "*Edges\n";
 			else
-				pajek_file << "*Edges :" << k+1 << " \"" << pajek_edges_kindsOf[k] << "\"\n";
+				pajek_file << "*Edges :" << k+1+pajek_arcs_kindsOf_count << " \"" << pajek_edges_kindsOf[k] << "\"\n";
 																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
    for (int i = 0; i < n_arcs_edges_total; i++){
 				if (pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strcmp(pajek_edges_kindsOf[k],pajek_arcs_timeStamps_kind[i])==0) ){
