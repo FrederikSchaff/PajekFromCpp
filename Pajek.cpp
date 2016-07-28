@@ -312,7 +312,9 @@ bool pajek_append (int time, bool final )
   pajek_file << "*Vertices " << pajek_vertices_count << "\n";
 	for (int i = 0; i < pajek_vertices_count; i++){
     if (PAJEK_FORCE_COMPLETE){
-      pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count);
+      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
+      	return false;
+			}
 		}
 
   	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
@@ -379,7 +381,9 @@ bool pajek_append (int time, bool final )
 				if (!pajek_arcs_isEdge[i] && (!diffKinds || strcmp(pajek_arcs_kindsOf[k],pajek_arcs_label[i])==0) ){
 
           if (PAJEK_FORCE_COMPLETE){
-           	pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i]);
+           	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
+							return false;
+						}
 					}
 
           if (diffKinds){
@@ -460,7 +464,9 @@ bool pajek_append (int time, bool final )
 			for (int i = 0; i < pajek_arcs_edges_count; i++){
 				if (pajek_arcs_isEdge[i] && (!diffKinds || strcmp(pajek_edges_kindsOf[k],pajek_arcs_label[i])==0 ) ){
         	if (PAJEK_FORCE_COMPLETE){
-           	pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i]);
+           	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
+            	return false;
+						}
 					}
      		if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
@@ -620,6 +626,10 @@ bool pajek_init_timeline(){
 
 /* Mark vertice with ID add time snapshot as active */
 bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot){
+	if (snapshot > PAJEK_MAX_SNAPSHOTS){
+		PAJEK_MSG("\nError! More snapshots than allowed via initialisation (PAJEK_MAX_SNAPSHOTS)");
+		return false;
+	}
 	int i = 0;
 	while (			pajek_vertices_timeStamps_id[i]!=-1 \
 					&& 	pajek_vertices_timeStamps_id[i]!= ID ){
@@ -639,6 +649,10 @@ bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot){
 
 /* Mark arcs/edges with Source and Target and Kind add time snapshot as active */
 bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snapshot, bool isEdge){
+  if (snapshot > PAJEK_MAX_SNAPSHOTS){
+		PAJEK_MSG("\nError! More snapshots than allowed via initialisation (PAJEK_MAX_SNAPSHOTS)");
+		return false;
+	}
 	int i = 0;
 
 	/*
