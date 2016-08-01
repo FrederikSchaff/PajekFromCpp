@@ -95,6 +95,7 @@
 
 /* from equal named LSD command */
 #define FOLDERSEP( dir ) ( dir[0] == '\0' ? "" : "/" )
+#define FOLDERSEP2( dir, dir2 ) ( dir2[0] == '\0' ? "" : FOLDERSEP( dir ) )
 
 /* The length of labels (in characters)*/
 #ifndef PAJEK_LABELSIZE

@@ -135,8 +135,9 @@ bool pajek_init( int serial, bool append, char const *dirname_suffix, char const
 bool pajek_openFile(bool append, int serial, int time)
 {
   snprintf(pajek_dir_path,sizeof(char)*64,"%s%s%s",\
-			pajek_dirname,\
-			FOLDERSEP(pajek_dirname_suffix),pajek_dirname_suffix);
+			pajek_dirname,  /*Ensure that there is no "/" at the end*/ \
+			FOLDERSEP2(pajek_dirname, pajek_dirname_suffix) \
+			,pajek_dirname_suffix);
 	if (pajek_dirname[0]!='\0')
 		NEW_DIR(pajek_dirname);
 	if (pajek_dirname_suffix[0]!='\0'){
@@ -152,12 +153,12 @@ bool pajek_openFile(bool append, int serial, int time)
 		}
 		snprintf(pajek_path,sizeof(char)*300,"%s%s%s_%s_s%d_t%d.%s", \
 						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
+						FOLDERSEP(pajek_dir_path),pajek_filename, \
 						pajek_filename_suffix, serial, time, "net" );
 	} else {
    snprintf(pajek_path,sizeof(char)*300,"%s%s%s_%s_s%d.%s", \
 						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
+						FOLDERSEP(pajek_dir_path),pajek_filename, \
 						pajek_filename_suffix, serial,  "paj" );
     PAJEK_MSG("\nPath of (temporary) .paj file is:\n\t");
     PAJEK_MSG(pajek_path);
@@ -551,13 +552,10 @@ bool pajek_partial_snaps(bool renew)
 		return false;
 	}
 	char rename[300];
-	/*snprintf(pajek_path,sizeof(char)*300,"%s%s%s_%s_%d.%s", \
-						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
-						pajek_filename_suffix, serial, "paj" ); */
+
   snprintf(rename,sizeof(char)*300,"%s%s%s_%s_s%d", \
 						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
+						FOLDERSEP(pajek_dir_path),pajek_filename, \
 						pajek_filename_suffix, pajek_serial );
 	snprintf(rename,sizeof(char)*300,"%s_part%i.%s",rename,\
 				pajek_snapshot_parts+1, "paj");
@@ -693,13 +691,10 @@ bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snaps
 	content of the old file. Delete the old file. */
 bool pajek_timeline_close(){
   char newFilePath[300]; //Final File Name
-	/*snprintf(pajek_path,sizeof(char)*300,"%s%s%s_%s_%d.%s", \
-						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
-						pajek_filename_suffix, serial, "paj" ); */
+
   snprintf(newFilePath,sizeof(char)*300,"%s%s%s_%s_s%d", \
 						pajek_dir_path,\
-						FOLDERSEP(pajek_filename),pajek_filename, \
+						FOLDERSEP(pajek_dir_path),pajek_filename, \
 						pajek_filename_suffix, pajek_serial );
 	char TimesPath[300];
 	snprintf(TimesPath,sizeof(char)*300,"%s_time.txt",newFilePath);
