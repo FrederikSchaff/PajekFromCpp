@@ -618,6 +618,9 @@ bool pajek_init_timeline(){
 	}
 	for (int i = 0; i < PAJEK_MAX_VERTICES; i++){
     pajek_vertices_timeStamps_id[i]=-1; //Initial value = not assigned
+    for (int j = 0; j < PAJEK_MAX_SNAPSHOTS; j++){
+    	pajek_vertices_timeStamps[i][j]=false;  //Init: Not active
+		}
 	}
 	return true;
 }
@@ -752,7 +755,7 @@ bool pajek_timeline_close(){
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g", \
 					 	pajek_vertices_timeStamps_id[i], /* ID */	\
-						pajek_vertices_label[i], /* label */ \
+						pajek_vertices_timeStamps_label[i], /* label */ \
             position_x, /* x-cord */ \
             position_y, /* y-cord  */ \
             0.5 /*fake value*/ \
