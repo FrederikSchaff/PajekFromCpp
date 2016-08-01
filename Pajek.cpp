@@ -747,7 +747,7 @@ bool pajek_timeline_close(){
 	bool first;
   pajek_file << "*Vertices " << n_vert << "\n";
 	for (int i = 0; i < n_vert; i++){
-  	pajek_relative_xy( (double) (pajek_vertices_timeStamps_id[i]) / (double) (n_vert), \
+  	pajek_relative_xy( (double) (i) / (double) (n_vert-1), \
 											 &position_x, &position_y);
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g", \
