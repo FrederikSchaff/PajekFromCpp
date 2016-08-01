@@ -47,8 +47,15 @@
 	#define PAJEK_MAX_SNAPSHOTS 200
 #endif
 
-/* The maximal number of diff. relations for each, arcs and edge.
-	Only relevant	if the grouped format is chosen. */
+/* The standard is to add the unique ID, zero padded, to the label. If labels
+	are unique this is not necessary and can be switched off. */
+#ifndef PAJEK_UNIQUE_VERTICE_LABELS
+	#define PAJEK_UNIQUE_VERTICE_LABELS false
+#endif
+
+/* The maximal number of diff. relations for arcs and edge (each single one).
+	Only relevant	if the grouped format is chosen. Note that PajekToSVG will
+	in this case not consider the colour (but provide an own for each rel.).*/
 #ifndef PAJEK_KINDS_RELATIONS
 	#define PAJEK_KINDS_RELATIONS 2
 #endif
@@ -168,7 +175,7 @@ bool pajek_arcs_timeStamps_isEdge[PAJEK_MAX_ARCS];
 //Similar for vertices.
 bool pajek_vertices_timeStamps[PAJEK_MAX_VERTICES][PAJEK_MAX_SNAPSHOTS];
 int pajek_vertices_timeStamps_id[PAJEK_MAX_VERTICES];
-char pajek_vertices_timeStamps_label[PAJEK_MAX_VERTICES][PAJEK_LABELSIZE];
+char pajek_vertices_timeStamps_label[PAJEK_MAX_VERTICES][PAJEK_LABELSIZE+6];
 
 /* The functions */
 
@@ -196,4 +203,8 @@ bool pajek_init_timeline();
 bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot);
 bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snapshot, bool isEdge);
 bool pajek_timeline_close();
+
+int pajek_Consequtive2Unique[PAJEK_MAX_VERTICES];
+int pajek_Unique2Consequtive[PAJEK_MAX_VERTICES];
+int pajek_consistent_IDs();
 

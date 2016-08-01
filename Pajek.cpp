@@ -289,6 +289,11 @@ bool pajek_append (int time, bool final )
 	 …
 
 	 */
+	int maxID;
+  if (PAJEK_FORCE_COMPLETE){
+	  /* Ensure increasing order of ids if time-line mode is active*/
+	  maxID=pajek_consistent_IDs();
+	}
 
 	//Name network
 	/*
@@ -309,21 +314,34 @@ bool pajek_append (int time, bool final )
 	 N1 "lab" coordX coordY value shape x_fact factX y_fact factY ic color [activ_int]
 	*/
 
+  int id;
+	char label[PAJEK_LABELSIZE+6];
 	double position_x, position_y;
   pajek_file << "*Vertices " << pajek_vertices_count << "\n";
 	for (int i = 0; i < pajek_vertices_count; i++){
+    if (PAJEK_UNIQUE_VERTICE_LABELS){
+  		snprintf(label,sizeof(char)*(PAJEK_LABELSIZE),"%s", \
+				pajek_vertices_label[i]);
+		} else {
+      snprintf(label,sizeof(char)*(PAJEK_LABELSIZE+6),"%s_%05d", \
+				pajek_vertices_label[i],pajek_vertices_ID[i]);
+		}
     if (PAJEK_FORCE_COMPLETE){
       if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
       	return false;
 			}
-		}
-
-  	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
+      id=pajek_Unique2Consequtive[i]+1;
+      pajek_relative_xy( (double) (id) / (double) (maxID-1), \
+												 &position_x, &position_y);
+		} else {
+			id=pajek_vertices_ID[i];
+    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count-1), \
 											 &position_x, &position_y);
+		}
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g %s x_fact %g y_fact %g ic %s", \
-					 	pajek_vertices_ID[i], /* ID */	\
-						pajek_vertices_label[i], /* label */ \
+					 	id, /* ID */	\
+						label, /* label */ \
             position_x, /* x-cord */ \
             position_y, /* y-cord  */ \
             pajek_vertices_value[i], /*value*/ \
@@ -642,7 +660,13 @@ bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot){
 	}
 	if (pajek_vertices_timeStamps_id[i] == -1){
 	  pajek_vertices_timeStamps_id[i]=ID;
-    snprintf(pajek_vertices_timeStamps_label[i],sizeof(char)*PAJEK_LABELSIZE,"%s",label);
+		if (PAJEK_UNIQUE_VERTICE_LABELS){
+    	snprintf(pajek_vertices_timeStamps_label[i], \
+				sizeof(char)*(PAJEK_LABELSIZE),"%s",label,ID);
+		} else {
+    	snprintf(pajek_vertices_timeStamps_label[i], \
+				sizeof(char)*(PAJEK_LABELSIZE+6),"%s_%05d",label,ID);
+		}
 	}
 	pajek_vertices_timeStamps[i][snapshot-1]=true;
 	return true;
@@ -690,8 +714,20 @@ bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snaps
 	return true;
 }
 
+
 /* Create a new file for the complete dynamic network. Add the info. Copy the
-	content of the old file. Delete the old file. */
+	content of the old file. Delete the old file.
+	For PajekToSvg some things need to hold for the *new* first slice:
+	-	For each ID from 1 to the maximum, a vertice needs to exist.
+	- These vertices need to be printed in increasing order from top to down
+	- This needs to be taken care of for EACH snapshot
+	- For each vertice that is ever active, all active time-stamps need be present
+	- Each arc that will ever be created must be provided with all time-stamps
+		where it exists
+	- if multiple relations are chosen, the counter for the relations needs to be
+		consequtive accross the relations.
+	All this is taken care of.
+	*/
 bool pajek_timeline_close(){
   char newFilePath[300]; //Final File Name
 
@@ -723,12 +759,24 @@ bool pajek_timeline_close(){
 		return false;
 	}
 
-/* Now, write the summary timeline network first. */
+/* Now, write the summary timeline network first.
+	Ensure increasing order of ids*/
 
 	/* Count number of vertices */
 	int n_vert;
+  int maxID=0;
 	for (n_vert = 0; pajek_vertices_timeStamps_id[n_vert]!=-1 && n_vert < PAJEK_MAX_VERTICES;){
-    n_vert++;
+    maxID = max(maxID,pajek_vertices_timeStamps_id[n_vert]);
+		n_vert++;
+	}
+
+  int SortedVertices[maxID]; //[0]=m -> link to pajek_vertices_timeStamps_id[m]=1
+	for (int i = 0; i < maxID; i++){
+    SortedVertices[i]=-1; //missing
+	}
+
+	for (int i = 0; i<n_vert; i++){
+    SortedVertices[pajek_vertices_timeStamps_id[i]-1]=i;
 	}
 
 	//Name network
@@ -747,33 +795,62 @@ bool pajek_timeline_close(){
 	*/
 
 	double position_x, position_y;
+	int index;
+	char label[PAJEK_LABELSIZE+6];
 	bool first;
-  pajek_file << "*Vertices " << n_vert << "\n";
-	for (int i = 0; i < n_vert; i++){
-  	pajek_relative_xy( (double) (i) / (double) (n_vert-1), \
-											 &position_x, &position_y);
-		snprintf(	pajek_buffer,sizeof(char)*196, \
-						"  %i \"%s\" %g %g %g", \
-					 	pajek_vertices_timeStamps_id[i], /* ID */	\
-						pajek_vertices_timeStamps_label[i], /* label */ \
+  pajek_file << "*Vertices " << maxID /* n_vert and missing */ << "\n";
+	for (int i = 0; i < maxID; i++){
+		index = SortedVertices[i];
+  	pajek_relative_xy( (double) (i) / (double) (maxID-1), \
+												&position_x, &position_y);
+
+		//If Vertice exists
+		if (index > -1 ){
+
+			snprintf(	pajek_buffer,sizeof(char)*196, \
+							"  %i \"%s\" %g %g %g", \
+						 	pajek_vertices_timeStamps_id[index], /* ID */	\
+							pajek_vertices_timeStamps_label[index], /* label */ \
+	            position_x, /* x-cord */ \
+	            position_y, /* y-cord  */ \
+	            0.5 /*fake value*/ \
+	            );
+	    pajek_file << pajek_buffer;
+			pajek_file << " [";  /* if there is an entry then at least
+															once there is a snapshot*/
+			first = true;
+			for (int j=0; j<pajek_snapshot_count;j++){
+				if(pajek_vertices_timeStamps[index][j]){
+					if (!first){
+						pajek_file << ",";
+					}
+					first = false;
+					pajek_file << pajek_timeline[j];
+				}
+			}
+	    pajek_file << "]\n";
+
+		//Else Missing
+		} else {
+       snprintf(label,sizeof(char)*(PAJEK_LABELSIZE+6),"Missing_%05d", \
+				i+1);
+			snprintf(	pajek_buffer,sizeof(char)*196, \
+						"  %i \"%s\" %g %g %g\n", \
+					 	i+1, /* ID */	\
+						label, /* label */ \
             position_x, /* x-cord */ \
             position_y, /* y-cord  */ \
             0.5 /*fake value*/ \
             );
-    pajek_file << pajek_buffer;
-		pajek_file << " [";  /* if there is an entry then at least
-														once there is a snapshot*/
-		first = true;
-		for (int j=0; j<pajek_snapshot_count;j++){
-			if(pajek_vertices_timeStamps[i][j]){
-				if (!first){
-					pajek_file << ",";
-				}
-				first = false;
-				pajek_file << pajek_timeline[j];
-			}
+    	pajek_file << pajek_buffer;
+			/* For PajekToSvgAnim it is important that the range of vertice IDs is
+			consequtive. Imagine that you only *safe* the network every 100
+			time-steps (by calling the pajek_* commands). In the meantime some
+			*vertices* might have been created with a new unique ID and *deleted*
+			again without noticing it. These will now be "added" to the end of the
+			*vertices count. */
+
 		}
-    pajek_file << "]\n";
 	}
 
 	//Add Arcs
@@ -965,3 +1042,15 @@ bool pajek_timeline_close(){
 	return true;
 
 }
+
+/* Link the unique, time-consistent IDs to snapshot-unique, consecutive IDs*/
+int pajek_consistent_IDs(){
+	int maxID = 0;
+	for (int i = 0; i < pajek_vertices_count; i++){
+    pajek_Consequtive2Unique[i]=pajek_vertices_ID[i];
+    pajek_Unique2Consequtive[pajek_vertices_ID[i]]=i;
+		maxID = max(maxID,pajek_vertices_ID[i]);
+	}
+	return maxID;
+}
+
