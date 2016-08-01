@@ -96,6 +96,11 @@
 /* from equal named LSD command */
 #define FOLDERSEP( dir ) ( dir[0] == '\0' ? "" : "/" )
 
+/* The length of labels (in characters)*/
+#ifndef PAJEK_LABELSIZE
+	#define PAJEK_LABELSIZE 16
+#endif
+
 /* Some global variables */
 char pajek_msg[196];
 char const pajek_dirname[] = PAJEK_DIRNAME;
@@ -120,7 +125,7 @@ int pajek_snapshot_parts;
 
 int pajek_vertices_count;
 int pajek_vertices_ID[PAJEK_MAX_VERTICES];
-char pajek_vertices_label[PAJEK_MAX_VERTICES][16];
+char pajek_vertices_label[PAJEK_MAX_VERTICES][PAJEK_LABELSIZE];
 int pajek_vertices_shape[PAJEK_MAX_VERTICES];
 char pajek_vertices_colour[PAJEK_MAX_VERTICES][16]; //see pajek manual!
 double pajek_vertices_xfact[PAJEK_MAX_VERTICES]; //relative size
@@ -137,15 +142,15 @@ bool pajek_arcs_isEdge[PAJEK_MAX_ARCS];  //0/false: Arc, else Edge
 int pajek_arcs_source[PAJEK_MAX_ARCS];
 int pajek_arcs_target[PAJEK_MAX_ARCS];
 double pajek_arcs_value[PAJEK_MAX_ARCS];
-char pajek_arcs_label[PAJEK_MAX_ARCS][16];
+char pajek_arcs_label[PAJEK_MAX_ARCS][PAJEK_LABELSIZE];
 int pajek_arcs_width[PAJEK_MAX_ARCS];
 char pajek_arcs_colour[PAJEK_MAX_ARCS][16];
 int pajek_arcs_interval_start[PAJEK_MAX_ARCS]; //Beginning of current activity inteval
 int pajek_arcs_interval_end[PAJEK_MAX_ARCS];
 
-char pajek_arcs_kindsOf[PAJEK_KINDS_RELATIONS][16]; //Alternatively, provide number of different relations
+char pajek_arcs_kindsOf[PAJEK_KINDS_RELATIONS][PAJEK_LABELSIZE]; //Alternatively, provide number of different relations
 int  pajek_arcs_kindsOf_count=0;
-char pajek_edges_kindsOf[PAJEK_KINDS_RELATIONS][16]; //Alternatively, provide number of different relations
+char pajek_edges_kindsOf[PAJEK_KINDS_RELATIONS][PAJEK_LABELSIZE]; //Alternatively, provide number of different relations
 int  pajek_edges_kindsOf_count=0;
 
 /* A set of arrays to hold the time-stamps for each arc/edge
@@ -157,12 +162,12 @@ int pajek_timeline[PAJEK_MAX_SNAPSHOTS]; //for each snapshot, hold the time-info
 bool pajek_arcs_timeStamps[PAJEK_MAX_ARCS][PAJEK_MAX_SNAPSHOTS];
 int pajek_arcs_timeStamps_source[PAJEK_MAX_ARCS];
 int pajek_arcs_timeStamps_target[PAJEK_MAX_ARCS];
-char pajek_arcs_timeStamps_kind[PAJEK_MAX_ARCS][16];
+char pajek_arcs_timeStamps_kind[PAJEK_MAX_ARCS][PAJEK_LABELSIZE];
 bool pajek_arcs_timeStamps_isEdge[PAJEK_MAX_ARCS];
 //Similar for vertices.
 bool pajek_vertices_timeStamps[PAJEK_MAX_VERTICES][PAJEK_MAX_SNAPSHOTS];
 int pajek_vertices_timeStamps_id[PAJEK_MAX_VERTICES];
-char pajek_vertices_timeStamps_label[PAJEK_MAX_VERTICES][16];
+char pajek_vertices_timeStamps_label[PAJEK_MAX_VERTICES][PAJEK_LABELSIZE];
 
 /* The functions */
 

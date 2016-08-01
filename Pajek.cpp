@@ -29,7 +29,7 @@ bool pajek_vertices_add(int ID, char const label[],  int shape, char const *colo
 	}
 
   pajek_vertices_ID[pajek_vertices_count]	= ID;
-  snprintf(pajek_vertices_label[pajek_vertices_count],sizeof(char)*16,"%s",label); //Check
+  snprintf(pajek_vertices_label[pajek_vertices_count],sizeof(char)*PAJEK_LABELSIZE,"%s",label); //Check
   pajek_vertices_shape[pajek_vertices_count] = shape;
 	//0=ellipse, 1=box, 2=diamond, 3=triangle, 4=cross, 5=empty, 6=house, 7=man, or 8=woman
   snprintf(pajek_vertices_colour[pajek_vertices_count],sizeof(char)*16,"%s",colour);
@@ -55,7 +55,7 @@ bool pajek_arcs_add(bool isedge, int source, int target, double value, char cons
   pajek_arcs_source[pajek_arcs_edges_count] = source;
   pajek_arcs_target[pajek_arcs_edges_count] = target;
   pajek_arcs_value[pajek_arcs_edges_count] = value;
-  snprintf(pajek_arcs_label[pajek_arcs_edges_count],sizeof(char)*16,"%s",label);
+  snprintf(pajek_arcs_label[pajek_arcs_edges_count],sizeof(char)*PAJEK_LABELSIZE,"%s",label);
   pajek_arcs_width[pajek_arcs_edges_count] = width;
   snprintf(pajek_arcs_colour[pajek_arcs_edges_count],sizeof(char)*16,"%s",colour);
 	pajek_arcs_interval_start[pajek_arcs_edges_count] =  start;
@@ -76,12 +76,12 @@ bool pajek_init_KindsOfRelation(char const *relation, bool isedge)
 {
   if (max(pajek_arcs_kindsOf_count,pajek_edges_kindsOf_count)< PAJEK_KINDS_RELATIONS){
 		if (isedge) {
-      snprintf(pajek_edges_kindsOf[pajek_edges_kindsOf_count],sizeof(char)*16,"%s",relation);
+      snprintf(pajek_edges_kindsOf[pajek_edges_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
 			sprintf(pajek_msg,"\nAdded %s relation %i, %s","Edge",pajek_edges_kindsOf_count+1,relation);
 			PAJEK_MSG(pajek_msg);
 	    pajek_edges_kindsOf_count++;
 		} else {
-	  	snprintf(pajek_arcs_kindsOf[pajek_arcs_kindsOf_count],sizeof(char)*16,"%s",relation);
+	  	snprintf(pajek_arcs_kindsOf[pajek_arcs_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
       sprintf(pajek_msg,"\nAdded %s relation %i, %s","Arc",pajek_arcs_kindsOf_count+1,relation);
 			PAJEK_MSG(pajek_msg);
 	    pajek_arcs_kindsOf_count++;
@@ -376,9 +376,9 @@ bool pajek_append (int time, bool final )
 				pajek_file << "*Arcs\n";
 			else
 				pajek_file << "*Arcs :" << k+1 << " \"" << pajek_arcs_kindsOf[k] << "\"\n";
-																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
+
 			for (int i = 0; i < pajek_arcs_edges_count; i++){
-				if (!pajek_arcs_isEdge[i] && (!diffKinds || strcmp(pajek_arcs_kindsOf[k],pajek_arcs_label[i])==0) ){
+				if (!pajek_arcs_isEdge[i] && (!diffKinds || strncmp(pajek_arcs_kindsOf[k],pajek_arcs_label[i],PAJEK_LABELSIZE)==0) ){
 
           if (PAJEK_FORCE_COMPLETE){
            	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
@@ -460,9 +460,9 @@ bool pajek_append (int time, bool final )
 				pajek_file << "*Edges\n";
 			else
 				pajek_file << "*Edges :" << k+1+pajek_arcs_kindsOf_count << " \"" << pajek_edges_kindsOf[k] << "\"\n";
-																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
+
 			for (int i = 0; i < pajek_arcs_edges_count; i++){
-				if (pajek_arcs_isEdge[i] && (!diffKinds || strcmp(pajek_edges_kindsOf[k],pajek_arcs_label[i])==0 ) ){
+				if (pajek_arcs_isEdge[i] && (!diffKinds || strncmp(pajek_edges_kindsOf[k],pajek_arcs_label[i],PAJEK_LABELSIZE)==0 ) ){
         	if (PAJEK_FORCE_COMPLETE){
            	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
             	return false;
@@ -641,7 +641,7 @@ bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot){
 	}
 	if (pajek_vertices_timeStamps_id[i] == -1){
 	  pajek_vertices_timeStamps_id[i]=ID;
-    snprintf(pajek_vertices_timeStamps_label[i],sizeof(char)*16,"%s",label);
+    snprintf(pajek_vertices_timeStamps_label[i],sizeof(char)*PAJEK_LABELSIZE,"%s",label);
 	}
 	pajek_vertices_timeStamps[i][snapshot-1]=true;
 	return true;
@@ -665,7 +665,7 @@ bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snaps
 	while (			pajek_arcs_timeStamps_source[i]!= -1 \
 					&& 	(		pajek_arcs_timeStamps_source[i]!= Source \
 							||  pajek_arcs_timeStamps_target[i]!= Target \
-							|| 	strcmp(pajek_arcs_timeStamps_kind[i],Kind)!=0 \
+							|| 	strncmp(pajek_arcs_timeStamps_kind[i],Kind,PAJEK_LABELSIZE)!=0 \
 							) \
 				 ){
 		i++;
@@ -682,7 +682,7 @@ bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snaps
 	  pajek_arcs_timeStamps_source[i]= Source;
   	pajek_arcs_timeStamps_target[i]= Target;
     pajek_arcs_timeStamps_isEdge[i]= isEdge;
-		snprintf(pajek_arcs_timeStamps_kind[i],sizeof(char)*16,"%s",Kind);
+		snprintf(pajek_arcs_timeStamps_kind[i],sizeof(char)*PAJEK_LABELSIZE,"%s",Kind);
 	}
 
 	pajek_arcs_timeStamps[i][snapshot-1]=true;
@@ -810,9 +810,9 @@ bool pajek_timeline_close(){
 				pajek_file << "*Arcs\n";
 			else
 				pajek_file << "*Arcs :" << k+1 << " \"" << pajek_arcs_kindsOf[k] << "\"\n";
-																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
+
 			for (int i = 0; i < n_arcs_edges_total; i++){
-				if (!pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strcmp(pajek_arcs_kindsOf[k],pajek_arcs_timeStamps_kind[i])==0) ){
+				if (!pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strncmp(pajek_arcs_kindsOf[k],pajek_arcs_timeStamps_kind[i],PAJEK_LABELSIZE)==0) ){
           if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g", \
@@ -890,9 +890,9 @@ bool pajek_timeline_close(){
 				pajek_file << "*Edges\n";
 			else
 				pajek_file << "*Edges :" << k+1+pajek_arcs_kindsOf_count << " \"" << pajek_edges_kindsOf[k] << "\"\n";
-																						//pajek_arcs_label[PAJEK_MAX_ARCS][16]
+
    for (int i = 0; i < n_arcs_edges_total; i++){
-				if (pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strcmp(pajek_edges_kindsOf[k],pajek_arcs_timeStamps_kind[i])==0) ){
+				if (pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strncmp(pajek_edges_kindsOf[k],pajek_arcs_timeStamps_kind[i],PAJEK_LABELSIZE)==0) ){
           if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g", \
