@@ -196,7 +196,7 @@ bool pajek_partial_snaps( bool renew);
 
 bool pajek_init_KindsOfRelation( char const *relation, bool isedge);
 
-char *pajek_shape( int shape=0);
+char const *pajek_shape( int shape=0);
 bool pajek_relative_xy( double tau, double *pos_x,double *pos_y);
 
 bool pajek_init_timeline();
@@ -204,7 +204,7 @@ bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot);
 bool pajek_arcs_timeline_add(int Source, int Target, char const *Kind, int snapshot, bool isEdge);
 bool pajek_timeline_close();
 
-int pajek_Consequtive2Unique[PAJEK_MAX_VERTICES];
-int pajek_Unique2Consequtive[PAJEK_MAX_VERTICES];
+int pajek_Consequtive2Unique[PAJEK_MAX_VERTICES+1];
+int pajek_Unique2Consequtive[PAJEK_MAX_VERTICES+1];
 int pajek_consistent_IDs();
 

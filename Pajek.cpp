@@ -291,7 +291,7 @@ bool pajek_append (int time, bool final )
 	 */
 	int maxID;
   if (PAJEK_FORCE_COMPLETE){
-	  /* Ensure increasing order of ids if time-line mode is active*/
+	  /* Ensure increasing order of and consecutive ids in time-line mode */
 	  maxID=pajek_consistent_IDs();
 	}
 
@@ -327,15 +327,15 @@ bool pajek_append (int time, bool final )
 				pajek_vertices_label[i],pajek_vertices_ID[i]);
 		}
     if (PAJEK_FORCE_COMPLETE){
+    	id=i+1;
       if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
       	return false;
 			}
-      id=pajek_Unique2Consequtive[i]+1;
-      pajek_relative_xy( (double) (id) / (double) (maxID-1), \
+      pajek_relative_xy( (double) (pajek_vertices_ID[i]-1) / (double) (maxID), \
 												 &position_x, &position_y);
 		} else {
 			id=pajek_vertices_ID[i];
-    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count-1), \
+    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
 											 &position_x, &position_y);
 		}
 		snprintf(	pajek_buffer,sizeof(char)*196, \
@@ -389,6 +389,7 @@ bool pajek_append (int time, bool final )
 	bool diffKinds = (pajek_arcs_kindsOf_count>0);
 	int k = 0;
   int j = 0;
+	int source,target;
 	if (pajek_arcs_count>0){
   	do{
 			if (!diffKinds)
@@ -400,16 +401,20 @@ bool pajek_append (int time, bool final )
 				if (!pajek_arcs_isEdge[i] && (!diffKinds || strncmp(pajek_arcs_kindsOf[k],pajek_arcs_label[i],PAJEK_LABELSIZE)==0) ){
 
           if (PAJEK_FORCE_COMPLETE){
+          	source = pajek_Unique2Consequtive[pajek_arcs_source[i]];
+						target = pajek_Unique2Consequtive[pajek_arcs_target[i]];
            	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
 							return false;
 						}
+					} else {
+						source = pajek_arcs_source[i];
+						target = pajek_arcs_target[i];
 					}
-
           if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g w %i c %s", \
-									 	pajek_arcs_source[i], /* source */	\
-										pajek_arcs_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
 			              pajek_arcs_value[i], /*value*/ \
 			              pajek_arcs_width[i], /*width*/ \
 			              pajek_arcs_colour[i] /*colour*/ \
@@ -417,8 +422,8 @@ bool pajek_append (int time, bool final )
 					} else {
             snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g w %i c %s l \"%s\"", \
-									 	pajek_arcs_source[i], /* source */	\
-										pajek_arcs_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
 			              pajek_arcs_value[i], /*value*/ \
 			              pajek_arcs_width[i], /*width*/ \
 			              pajek_arcs_colour[i], /*colour*/ \
@@ -459,14 +464,14 @@ bool pajek_append (int time, bool final )
 	}
   //Add Edges
 	/*
-		*Arcs :1 "relation name"
+		*Edges :1 "relation name"
 		 init_vertex term_vertex value w width c color [activ_int]
 		 …
-		*Arcs :2 "relation name"
+		*Edges :2 "relation name"
 		 init_vertex term_vertex value w width c color [activ_int]
 		 …
 		…
-		*Arcs :R "relation name"
+		*Edges :R "relation name"
 		 init_vertex term_vertex value w width c color [activ_int]
 		 …
 	*/
@@ -483,15 +488,20 @@ bool pajek_append (int time, bool final )
 			for (int i = 0; i < pajek_arcs_edges_count; i++){
 				if (pajek_arcs_isEdge[i] && (!diffKinds || strncmp(pajek_edges_kindsOf[k],pajek_arcs_label[i],PAJEK_LABELSIZE)==0 ) ){
         	if (PAJEK_FORCE_COMPLETE){
+          	source = pajek_Unique2Consequtive[pajek_arcs_source[i]];
+						target = pajek_Unique2Consequtive[pajek_arcs_target[i]];
            	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
             	return false;
 						}
+					} else {
+						source = pajek_arcs_source[i];
+						target = pajek_arcs_target[i];
 					}
      		if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g w %i c %s", \
-									 	pajek_arcs_source[i], /* source */	\
-										pajek_arcs_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
 			              pajek_arcs_value[i], /*value*/ \
 			              pajek_arcs_width[i], /*width*/ \
 			              pajek_arcs_colour[i] /*colour*/ \
@@ -499,8 +509,8 @@ bool pajek_append (int time, bool final )
 					} else {
             snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g w %i c %s l \"%s\"", \
-									 	pajek_arcs_source[i], /* source */	\
-										pajek_arcs_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
 			              pajek_arcs_value[i], /*value*/ \
 			              pajek_arcs_width[i], /*width*/ \
 			              pajek_arcs_colour[i], /*colour*/ \
@@ -539,6 +549,8 @@ bool pajek_append (int time, bool final )
 			PAJEK_MSG(pajek_msg);
 		}
 	}
+	/*Add a blank line*/
+  pajek_file << "\n";
 
 	if (!final){
 		pajek_clear(); //Set counters back for next slice
@@ -599,7 +611,7 @@ bool pajek_partial_snaps(bool renew)
 	}
 }
 
-char *pajek_shape(int shape){
+char const *pajek_shape(int shape){
 	switch (shape){
 		case 0: return "ellipse";
 		case 1: return "box";
@@ -762,22 +774,15 @@ bool pajek_timeline_close(){
 /* Now, write the summary timeline network first.
 	Ensure increasing order of ids*/
 
-	/* Count number of vertices */
-	int n_vert;
-  int maxID=0;
-	for (n_vert = 0; pajek_vertices_timeStamps_id[n_vert]!=-1 && n_vert < PAJEK_MAX_VERTICES;){
-    maxID = max(maxID,pajek_vertices_timeStamps_id[n_vert]);
-		n_vert++;
+  int maxID = 0;
+	int n_vertices=0;
+	for (int i = 0; pajek_vertices_timeStamps_id[i]!=-1 && i <PAJEK_MAX_VERTICES;\
+				i++,n_vertices++){
+    pajek_Consequtive2Unique[i+1]=pajek_vertices_timeStamps_id[i];
+    pajek_Unique2Consequtive[pajek_vertices_timeStamps_id[i]]=i+1;
+		maxID = max(maxID,pajek_vertices_timeStamps_id[i]);
 	}
 
-  int SortedVertices[maxID]; //[0]=m -> link to pajek_vertices_timeStamps_id[m]=1
-	for (int i = 0; i < maxID; i++){
-    SortedVertices[i]=-1; //missing
-	}
-
-	for (int i = 0; i<n_vert; i++){
-    SortedVertices[pajek_vertices_timeStamps_id[i]-1]=i;
-	}
 
 	//Name network
 	/*
@@ -795,62 +800,35 @@ bool pajek_timeline_close(){
 	*/
 
 	double position_x, position_y;
-	int index;
-	char label[PAJEK_LABELSIZE+6];
+  char label[PAJEK_LABELSIZE+6];
 	bool first;
-  pajek_file << "*Vertices " << maxID /* n_vert and missing */ << "\n";
-	for (int i = 0; i < maxID; i++){
-		index = SortedVertices[i];
-  	pajek_relative_xy( (double) (i) / (double) (maxID-1), \
-												&position_x, &position_y);
+  pajek_file << "*Vertices " << n_vertices << "\n";
+	for (int i = 0; i < n_vertices; i++){
+  	pajek_relative_xy( (double) (i) / (double) (n_vertices), \
+											 &position_x, &position_y);
 
-		//If Vertice exists
-		if (index > -1 ){
-
-			snprintf(	pajek_buffer,sizeof(char)*196, \
-							"  %i \"%s\" %g %g %g", \
-						 	pajek_vertices_timeStamps_id[index], /* ID */	\
-							pajek_vertices_timeStamps_label[index], /* label */ \
-	            position_x, /* x-cord */ \
-	            position_y, /* y-cord  */ \
-	            0.5 /*fake value*/ \
-	            );
-	    pajek_file << pajek_buffer;
-			pajek_file << " [";  /* if there is an entry then at least
-															once there is a snapshot*/
-			first = true;
-			for (int j=0; j<pajek_snapshot_count;j++){
-				if(pajek_vertices_timeStamps[index][j]){
-					if (!first){
-						pajek_file << ",";
-					}
-					first = false;
-					pajek_file << pajek_timeline[j];
-				}
-			}
-	    pajek_file << "]\n";
-
-		//Else Missing
-		} else {
-       snprintf(label,sizeof(char)*(PAJEK_LABELSIZE+6),"Missing_%05d", \
-				i+1);
-			snprintf(	pajek_buffer,sizeof(char)*196, \
-						"  %i \"%s\" %g %g %g\n", \
-					 	i+1, /* ID */	\
-						label, /* label */ \
+		snprintf(	pajek_buffer,sizeof(char)*196, \
+						"  %i \"%s\" %g %g %g", \
+					 	pajek_Unique2Consequtive[pajek_vertices_timeStamps_id[i]], /* Conesqutive ID */	\
+						pajek_vertices_timeStamps_label[i], /* label */ \
             position_x, /* x-cord */ \
             position_y, /* y-cord  */ \
             0.5 /*fake value*/ \
             );
-    	pajek_file << pajek_buffer;
-			/* For PajekToSvgAnim it is important that the range of vertice IDs is
-			consequtive. Imagine that you only *safe* the network every 100
-			time-steps (by calling the pajek_* commands). In the meantime some
-			*vertices* might have been created with a new unique ID and *deleted*
-			again without noticing it. These will now be "added" to the end of the
-			*vertices count. */
-
+    pajek_file << pajek_buffer;
+		pajek_file << " [";  /* if there is an entry then at least
+														once there is a snapshot*/
+		first = true;
+		for (int j=0; j<pajek_snapshot_count;j++){
+			if(pajek_vertices_timeStamps[i][j]){
+				if (!first){
+					pajek_file << ",";
+				}
+				first = false;
+				pajek_file << pajek_timeline[j];
+			}
 		}
+    pajek_file << "]\n";
 	}
 
 	//Add Arcs
@@ -867,7 +845,8 @@ bool pajek_timeline_close(){
 		 …
 	*/
 	bool diffKinds = (pajek_arcs_kindsOf_count>0);
-	int k = 0;
+	int source,target;
+	int k = 0;  /* Relations counter */
   int j = 0;
 	int m_arcs = 0, m=0;
 	int n_arcs_edges_total = 0;
@@ -888,18 +867,20 @@ bool pajek_timeline_close(){
 
 			for (int i = 0; i < n_arcs_edges_total; i++){
 				if (!pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strncmp(pajek_arcs_kindsOf[k],pajek_arcs_timeStamps_kind[i],PAJEK_LABELSIZE)==0) ){
-          if (diffKinds){
+          source = pajek_Unique2Consequtive[pajek_arcs_timeStamps_source[i]];
+					target = pajek_Unique2Consequtive[pajek_arcs_timeStamps_target[i]];
+					if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g", \
-									 	pajek_arcs_timeStamps_source[i], /* source */	\
-										pajek_arcs_timeStamps_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
                  		0.0 /* pseudo value */
 									);
 					} else {
             snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g l \"%s\"", \
-									 	pajek_arcs_timeStamps_source[i], /* source */	\
-										pajek_arcs_timeStamps_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
                  		0.0, /* pseudo value */ \
 	                  pajek_arcs_timeStamps_kind[i] /*label*/\
 									);
@@ -968,18 +949,20 @@ bool pajek_timeline_close(){
 
    for (int i = 0; i < n_arcs_edges_total; i++){
 				if (pajek_arcs_timeStamps_isEdge[i] && (!diffKinds || strncmp(pajek_edges_kindsOf[k],pajek_arcs_timeStamps_kind[i],PAJEK_LABELSIZE)==0) ){
-          if (diffKinds){
+          source = pajek_Unique2Consequtive[pajek_arcs_timeStamps_source[i]];
+					target = pajek_Unique2Consequtive[pajek_arcs_timeStamps_target[i]];
+					if (diffKinds){
 						snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g", \
-									 	pajek_arcs_timeStamps_source[i], /* source */	\
-										pajek_arcs_timeStamps_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
                  		0.0 /* pseudo value */
 									);
 					} else {
             snprintf(	pajek_buffer,sizeof(char)*196, \
 										"  %i %i %g l \"%s\"", \
-									 	pajek_arcs_timeStamps_source[i], /* source */	\
-										pajek_arcs_timeStamps_target[i], /* target */ \
+									 	source, /* source */	\
+										target, /* target */ \
                  		0.0, /* pseudo value */ \
 	                  pajek_arcs_timeStamps_kind[i] /*label*/\
 									);
@@ -1010,6 +993,9 @@ bool pajek_timeline_close(){
 			PAJEK_MSG(pajek_msg);
 		}
 	}
+
+	/*Add a blank line*/
+  pajek_file << "\n";
 
 	/* Now that the "new" file is fine, add the content of the former snapshots
 		file */
@@ -1043,14 +1029,17 @@ bool pajek_timeline_close(){
 
 }
 
-/* Link the unique, time-consistent IDs to snapshot-unique, consecutive IDs*/
+/* Link the unique, time-consistent IDs to snapshot-unique, consecutive IDs
+	Note: unique IDs range from 1 to pajek_vertices_count inclusive!*/
 int pajek_consistent_IDs(){
 	int maxID = 0;
 	for (int i = 0; i < pajek_vertices_count; i++){
-    pajek_Consequtive2Unique[i]=pajek_vertices_ID[i];
-    pajek_Unique2Consequtive[pajek_vertices_ID[i]]=i;
+    pajek_Consequtive2Unique[i+1]=pajek_vertices_ID[i];
+    pajek_Unique2Consequtive[pajek_vertices_ID[i]]=i+1;
 		maxID = max(maxID,pajek_vertices_ID[i]);
 	}
 	return maxID;
 }
+
+
 
