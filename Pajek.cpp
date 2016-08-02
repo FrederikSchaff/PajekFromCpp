@@ -612,6 +612,14 @@ bool pajek_partial_snaps(bool renew)
 }
 
 char const *pajek_shape(int shape){
+	if (PAJEK_FORCE_COMPLETE){
+		/* PajekToSvgAnim does not support man/woman shape!*/
+		if (shape == 7){
+			shape = 2;
+		} else if (shape == 8) {
+			shape = 3;
+		}
+	}
 	switch (shape){
 		case 0: return "ellipse";
 		case 1: return "box";
