@@ -20,7 +20,7 @@ void pajek_clear(){
 }
 
 /* Add a vertice */
-bool pajek_vertices_add(int ID, char const label[],  int shape, char const *colour, double x_fact, double y_fact, double value, int start, int end )
+bool pajek_vertices_add(int ID, char const label[],  int shape, char const *colour, double x_fact, double y_fact, double value, double x_pos, double y_pos, int start, int end )
 {
 
 	if (pajek_vertices_count == PAJEK_MAX_VERTICES) {
@@ -38,6 +38,8 @@ bool pajek_vertices_add(int ID, char const label[],  int shape, char const *colo
   pajek_vertices_value[pajek_vertices_count] = value;
 	pajek_vertices_interval_start[pajek_vertices_count] = start;
   pajek_vertices_interval_end[pajek_vertices_count] = end;
+  pajek_vertices_x_pos[pajek_vertices_count] = x_pos;
+  pajek_vertices_y_pos[pajek_vertices_count] = y_pos;
 
   pajek_vertices_count++;
  	return true;
@@ -326,17 +328,22 @@ bool pajek_append (int time, bool final )
       snprintf(label,sizeof(char)*(PAJEK_LABELSIZE+6),"%s_%05d", \
 				pajek_vertices_label[i],pajek_vertices_ID[i]);
 		}
-    if (PAJEK_FORCE_COMPLETE){
-    	id=i+1;
-      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
-      	return false;
-			}
-      pajek_relative_xy( (double) (pajek_vertices_ID[i]-1) / (double) (maxID), \
+
+    position_x=pajek_vertices_x_pos[i];
+    position_y=pajek_vertices_y_pos[i];
+		if (position_x < 0 || position_x > 1 || position_y < 0 || position_y > 1){
+	    if (PAJEK_FORCE_COMPLETE){
+	    	id=i+1;
+	      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
+	      	return false;
+				}
+	      pajek_relative_xy( (double) (pajek_vertices_ID[i]-1) / (double) (maxID), \
+													 &position_x, &position_y);
+			} else {
+				id=pajek_vertices_ID[i];
+	    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
 												 &position_x, &position_y);
-		} else {
-			id=pajek_vertices_ID[i];
-    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
-											 &position_x, &position_y);
+			}
 		}
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g %s x_fact %g y_fact %g ic %s", \
@@ -635,7 +642,7 @@ char const *pajek_shape(int shape){
 }
 
 /* Calculate the position on the circle. */
-bool pajek_relative_xy(double tau, double *pos_x,double *pos_y)
+bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius)
 {
 	if (tau > 1.0 || tau < 0.0){
 		PAJEK_MSG("\nError in pajek_relative_xy. Invalid value for tau");
@@ -812,8 +819,12 @@ bool pajek_timeline_close(){
 	bool first;
   pajek_file << "*Vertices " << n_vertices << "\n";
 	for (int i = 0; i < n_vertices; i++){
-  	pajek_relative_xy( (double) (i) / (double) (n_vertices), \
+    position_x=pajek_vertices_x_pos[i];
+    position_y=pajek_vertices_y_pos[i];
+		if (position_x < 0 || position_x > 1 || position_y < 0 || position_y > 1){
+  		pajek_relative_xy( (double) (i) / (double) (n_vertices), \
 											 &position_x, &position_y);
+		}
 
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g", \

@@ -141,6 +141,8 @@ double pajek_vertices_yfact[PAJEK_MAX_VERTICES]; //relative size
 double pajek_vertices_value[PAJEK_MAX_VERTICES]; //what for?
 int pajek_vertices_interval_start[PAJEK_MAX_VERTICES]; //Beginning of current activity inteval
 int pajek_vertices_interval_end[PAJEK_MAX_VERTICES]; //Beginning of current activity inteval
+double pajek_vertices_x_pos[PAJEK_MAX_ARCS];
+double pajek_vertices_y_pos[PAJEK_MAX_ARCS];
 
 //arcs are "special" edges.
 int pajek_arcs_count;
@@ -155,6 +157,7 @@ int pajek_arcs_width[PAJEK_MAX_ARCS];
 char pajek_arcs_colour[PAJEK_MAX_ARCS][16];
 int pajek_arcs_interval_start[PAJEK_MAX_ARCS]; //Beginning of current activity inteval
 int pajek_arcs_interval_end[PAJEK_MAX_ARCS];
+
 
 char pajek_arcs_kindsOf[PAJEK_KINDS_RELATIONS][PAJEK_LABELSIZE]; //Alternatively, provide number of different relations
 int  pajek_arcs_kindsOf_count=0;
@@ -181,7 +184,7 @@ char pajek_vertices_timeStamps_label[PAJEK_MAX_VERTICES][PAJEK_LABELSIZE+6];
 
 bool pajek_init( int serial, bool append=true, char const *dirname_suffix="", char const *filename_suffix="" );
 
-bool pajek_vertices_add( int ID, char const label[]="Vertice",  int shape=0, char const *colour="Black", double x_fact=1.0, double y_fact=-1.0, double value=1.0, int start=-1, int end=-1 );
+bool pajek_vertices_add( int ID, char const label[]="Vertice",  int shape=0, char const *colour="Black", double x_fact=1.0, double y_fact=-1.0, double value=1.0, double x_pos=-1.0, double y_pos=-1.0, int start=-1, int end=-1 );
 bool pajek_arcs_add( bool isedge, int source, int target, double value, char const *label="EdgeOrArc",  int width=1, char const *colour="Black", int start=-1, int end=-1 );
 
 
@@ -197,7 +200,7 @@ bool pajek_partial_snaps( bool renew);
 bool pajek_init_KindsOfRelation( char const *relation, bool isedge);
 
 char const *pajek_shape( int shape=0);
-bool pajek_relative_xy( double tau, double *pos_x,double *pos_y);
+bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius=1.0);
 
 bool pajek_init_timeline();
 bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot);
