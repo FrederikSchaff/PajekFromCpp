@@ -107,6 +107,7 @@ bool pajek_init( int serial, bool append, char const *dirname_suffix, char const
     pajek_append_mode=append;
 	}
   pajek_clear();
+  pajek_vertice_xy_pos_numb = -1.0; /* Not yet analysed */
   pajek_time=0;
   pajek_snapshot_count=0;
   pajek_snapshot_parts=0;
@@ -332,19 +333,24 @@ bool pajek_append (int time, bool final )
     position_x=pajek_vertices_x_pos[i];
     position_y=pajek_vertices_y_pos[i];
 		if (position_x < 0 || position_x > 1 || position_y < 0 || position_y > 1){
-	    if (PAJEK_FORCE_COMPLETE){
-	    	id=i+1;
-	      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
-	      	return false;
-				}
-	      pajek_relative_xy( (double) (pajek_vertices_ID[i]-1) / (double) (maxID), \
-													 &position_x, &position_y);
-			} else {
-				id=pajek_vertices_ID[i];
-	    	pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
+      if (PAJEK_FORCE_COMPLETE){
+      	pajek_relative_xy( (double) (pajek_vertices_ID[i]-1) / (double) (maxID), \
 												 &position_x, &position_y);
+			} else {
+        pajek_relative_xy( (double) (i) / (double) (pajek_vertices_count), \
+											 &position_x, &position_y);
 			}
 		}
+
+    if (PAJEK_FORCE_COMPLETE){
+    	id=i+1;
+      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
+      	return false;
+			}
+		} else {
+			id=pajek_vertices_ID[i];
+		}
+
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g %s x_fact %g y_fact %g ic %s", \
 					 	id, /* ID */	\
@@ -642,14 +648,16 @@ char const *pajek_shape(int shape){
 }
 
 /* Calculate the position on the circle. */
-bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius)
+bool pajek_relative_xy(double tau, double *pos_x, double *pos_y, double radius, double x_orig, double y_orig)
 {
 	if (tau > 1.0 || tau < 0.0){
 		PAJEK_MSG("\nError in pajek_relative_xy. Invalid value for tau");
 		return false;
 	}
-	*pos_x = .5 * cos(tau*2*3.14159265358979323846) + .5;
-	*pos_y = .5 * sin(tau*2*3.14159265358979323846) + .5;
+
+	*pos_x = radius * cos(tau*2*3.14159265358979323846) + x_orig;
+	*pos_y = radius * sin(tau*2*3.14159265358979323846) + y_orig;
+
 	return true;
 }
 
@@ -819,12 +827,12 @@ bool pajek_timeline_close(){
 	bool first;
   pajek_file << "*Vertices " << n_vertices << "\n";
 	for (int i = 0; i < n_vertices; i++){
-    position_x=pajek_vertices_x_pos[i];
-    position_y=pajek_vertices_y_pos[i];
-		if (position_x < 0 || position_x > 1 || position_y < 0 || position_y > 1){
+    //position_x=pajek_vertices_x_pos[i];
+    //position_y=pajek_vertices_y_pos[i];
+		//if (position_x < 0 || position_x > 1 || position_y < 0 || position_y > 1){
   		pajek_relative_xy( (double) (i) / (double) (n_vertices), \
 											 &position_x, &position_y);
-		}
+		//}
 
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g", \
@@ -1060,5 +1068,106 @@ int pajek_consistent_IDs(){
 	return maxID;
 }
 
+/* Partition a unit square into >=n non-adjacent squares and report center
+	positions and radius for the first n relevant partitions, starting with n=0.
+	An odd number of partitions is ensured, i.e. there is always a center square.
 
+	in: number of vertices. Optional: origin (center point of square) and size of
+																		overall plane.
+	out: radius of circles that can be drawn around each square, useful for
+			positioning additional vertices (of another type, say consumers) around
+			the original one (say, company).
 
+	manipulates the global variable  pajek_vertice_xy_pos[][2] which may be
+		accessed for the position of the single vertices direcly, or (prefered)
+		via the functions pajek_vertice_x_pos and pajek_vertice_y_pos
+*/
+double pajek_partition_unitSquare(int numb, \
+									 double orig_x, double orig_y, double orig_size){
+
+	/* Set the number of seperate vertices that shall be present */
+  pajek_vertice_xy_pos_numb=numb;
+
+	double diameter = orig_size; //The diameter of the subboxes fitting in each square of the matrix
+	//make sure that n is odd.
+	int n = numb;
+	if (n%2==2){
+		n+=1;
+	}
+
+	int m=1;
+	int rc = 1;
+	for (int i = 1; m < n; i++){
+		m+=i*4; /*for each side of the cube*/
+		rc+=2; /*extend the overal cube by one column/row to left/right/top/down*/
+	}
+	diameter/=((double)rc );
+
+	pajek_vertice_xy_pos_radius = diameter/2.0; /* Might be useful for "sub" positioning */
+
+	/* Next we draw, starting from the global center,
+			the center-positions of the circles. */
+
+  double x_pos=orig_x, y_pos=orig_y;
+	pajek_vertice_xy_pos[0][0]=x_pos; //x
+  pajek_vertice_xy_pos[0][1]=y_pos; //y
+
+	int doWhat = 5; /* jump, upper, left, lower, right */
+	int id = 1;  /* Here, the id ranges from 0 to numb-1 */
+	int i = 0;
+
+	while ( id < numb){
+
+		if (doWhat == 5){
+    	/* jump to next box */
+			x_pos += diameter;
+			y_pos += diameter;
+			doWhat = 1;
+			i++;
+		}
+
+    for (int j = 0; j < i; j++){
+	    switch(doWhat){
+
+				case 1: /* Draw UPPER points */
+					x_pos -= 2*diameter;
+					break;
+
+				case 2: /* Draw LEFT points */
+			    y_pos -= 2*diameter;
+					break;
+
+		    case 3: /* Draw LOWER points */
+			    x_pos += 2*diameter;
+					break;
+
+				case 4: /* Draw RIGHT points */
+			    y_pos += 2*diameter;
+					break;
+			}
+
+			pajek_vertice_xy_pos[id][0]= x_pos;
+	    pajek_vertice_xy_pos[id][1]= y_pos;
+			id++;
+		}
+		doWhat++;
+	}
+
+  return diameter/2.0;
+}
+
+/* Provide the position for the id ranging from 1 to numb */
+double pajek_vertice_x_pos(int id){
+	if (id < 1 || id > pajek_vertice_xy_pos_numb) {
+		return -1.0; // default value for NOT considering the given pos.
+	} else {
+  	return pajek_vertice_xy_pos[id-1][0];
+	}
+}
+double pajek_vertice_y_pos(int id){
+	if (id < 1 || id > pajek_vertice_xy_pos_numb) {
+		return -1.0; // default value for NOT considering the given pos.
+	} else {
+  	return pajek_vertice_xy_pos[id-1][1];
+	}
+}

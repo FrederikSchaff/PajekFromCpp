@@ -15,8 +15,9 @@
 /*   b)Add different kinds of arcs/edges if wanted via                        */
 /*    Pajek_init_KindsOfRelations() (after pajek_init() ).                    */
 /*   c)Each time you add arcs, edges or vertices use the according commands   */
-/*	 d)At the end of a time-period, use the command pajek_snapshot().         */
-/*	 e)At the end of the simulation, use the pajek_close() command.           */
+/*	 d)At the end of a time-period, use the command pajek_snapshot(t).        */
+/*      or - in case you do not want to save this period - use pajek_clear()  */
+/*	 e)At the end of the simulation, use the pajek_snapshot(t,final) command. */
 /*                                                                            */
 /* 3) if no "time" is provided, it is started with time = 1 and time is       */
 /*		automatically increased at each snappshot. One may create "initiale"    */
@@ -27,6 +28,7 @@
 /*                                                                            */
 /*   See the description of the #defines here and the pajek_ functions in the */
 /* 	 accompanying .cpp file for more information.                             */
+/*   Note: Not all functionality is documented here (yet)                     */
 /* ========================================================================== */
 
 #include <iostream>
@@ -44,7 +46,7 @@
 #endif
 
 #ifndef PAJEK_MAX_SNAPSHOTS
-	#define PAJEK_MAX_SNAPSHOTS 200
+	#define PAJEK_MAX_SNAPSHOTS 200 /* Maximal number of snapshots */
 #endif
 
 /* The standard is to add the unique ID, zero padded, to the label. If labels
@@ -200,7 +202,7 @@ bool pajek_partial_snaps( bool renew);
 bool pajek_init_KindsOfRelation( char const *relation, bool isedge);
 
 char const *pajek_shape( int shape=0);
-bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius=1.0);
+bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius=.5, double x_orig=.5, double y_orig=.5);
 
 bool pajek_init_timeline();
 bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot);
@@ -210,4 +212,11 @@ bool pajek_timeline_close();
 int pajek_Consequtive2Unique[PAJEK_MAX_VERTICES+1];
 int pajek_Unique2Consequtive[PAJEK_MAX_VERTICES+1];
 int pajek_consistent_IDs();
+
+double pajek_vertice_xy_pos[PAJEK_MAX_VERTICES][2];
+double pajek_vertice_xy_pos_radius; //The radious around the single vertices
+int pajek_vertice_xy_pos_numb; //The number of vertices used in this partiitioning
+double pajek_partition_unitSquare(int numb, double orig_x = 0.5, double orig_y = 0.5, double orig_size = 1.0);
+double pajek_vertice_x_pos(int id);
+double pajek_vertice_y_pos(int id);
 
