@@ -387,6 +387,9 @@ bool pajek_append (int time, bool final )
 	}
 
 	//Add Arcs
+	if (pajek_arcs_edges_count == 0){
+    PAJEK_MSG("\nNo Edges or Arcs! (Leads to errors with PajekToSvgAnim)");
+	}
 	/*
 		*Arcs :1 "relation name"
 		 init_vertex term_vertex value w width c color [activ_int]

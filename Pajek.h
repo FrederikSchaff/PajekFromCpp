@@ -31,6 +31,12 @@
 /*   Note: Not all functionality is documented here (yet)                     */
 /* ========================================================================== */
 
+/* Notes regarding PajekToSVGAnim:
+
+	. Always make sure that at least one arc/edge exists at each time-slice!
+
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
