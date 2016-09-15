@@ -107,7 +107,7 @@ bool pajek_init( int serial, bool append, char const *dirname_suffix, char const
     pajek_append_mode=append;
 	}
   pajek_clear();
-  pajek_vertice_xy_pos_numb = -1.0; /* Not yet analysed */
+  pajek_vertice_xy_pos_numb = -1; /* Not yet analysed */
   pajek_time=0;
   pajek_snapshot_count=0;
   pajek_snapshot_parts=0;
@@ -700,7 +700,7 @@ bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot){
 	  pajek_vertices_timeStamps_id[i]=ID;
 		if (PAJEK_UNIQUE_VERTICE_LABELS){
     	snprintf(pajek_vertices_timeStamps_label[i], \
-				sizeof(char)*(PAJEK_LABELSIZE),"%s",label,ID);
+				sizeof(char)*(PAJEK_LABELSIZE),"%s",label);
 		} else {
     	snprintf(pajek_vertices_timeStamps_label[i], \
 				sizeof(char)*(PAJEK_LABELSIZE+6),"%s_%05d",label,ID);
@@ -826,7 +826,6 @@ bool pajek_timeline_close(){
 	*/
 
 	double position_x, position_y;
-  char label[PAJEK_LABELSIZE+6];
 	bool first;
   pajek_file << "*Vertices " << n_vertices << "\n";
 	for (int i = 0; i < n_vertices; i++){
