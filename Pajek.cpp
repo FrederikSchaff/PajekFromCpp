@@ -76,23 +76,29 @@ bool pajek_arcs_add(bool isedge, int source, int target, double value, char cons
 /* Add kinds of relation for a multiple edge/arc network.*/
 bool pajek_init_KindsOfRelation(char const *relation, bool isedge)
 {
-  if (max(pajek_arcs_kindsOf_count,pajek_edges_kindsOf_count)< PAJEK_KINDS_RELATIONS){
-		if (isedge) {
-      snprintf(pajek_edges_kindsOf[pajek_edges_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
-			sprintf(pajek_msg,"\nAdded %s relation %i, %s","Edge",pajek_edges_kindsOf_count+1,relation);
-			PAJEK_MSG(pajek_msg);
-	    pajek_edges_kindsOf_count++;
-		} else {
-	  	snprintf(pajek_arcs_kindsOf[pajek_arcs_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
-      sprintf(pajek_msg,"\nAdded %s relation %i, %s","Arc",pajek_arcs_kindsOf_count+1,relation);
-			PAJEK_MSG(pajek_msg);
-	    pajek_arcs_kindsOf_count++;
-		}
-		return true;
-	} else {
-		PAJEK_MSG("\nErrror! Increase the #define PAJEK_KINDS_RELATIONS.\n");
-		return false;
-	}
+  if (pajek_init_KindsOfRelation_check){
+    if (max(pajek_arcs_kindsOf_count,pajek_edges_kindsOf_count)< PAJEK_KINDS_RELATIONS){
+  		if (isedge) {
+        snprintf(pajek_edges_kindsOf[pajek_edges_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
+  			sprintf(pajek_msg,"\nAdded %s relation %i, %s","Edge",pajek_edges_kindsOf_count+1,relation);
+  			PAJEK_MSG(pajek_msg);
+  	    pajek_edges_kindsOf_count++;
+  		} else {
+  	  	snprintf(pajek_arcs_kindsOf[pajek_arcs_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
+        sprintf(pajek_msg,"\nAdded %s relation %i, %s","Arc",pajek_arcs_kindsOf_count+1,relation);
+  			PAJEK_MSG(pajek_msg);
+  	    pajek_arcs_kindsOf_count++;
+  		}
+  	  pajek_init_KindsOfRelation_check=false;
+    	return true;
+  	} else {
+  		PAJEK_MSG("\nErrror! Increase the #define PAJEK_KINDS_RELATIONS.\n");
+  		return false;
+  	}
+  } else {
+    PAJEK_MSG("\nError! First initialise pajek via pajek_init()!");
+    return false;
+  }
 }
 
 
@@ -106,6 +112,7 @@ bool pajek_init( int serial, bool append, char const *dirname_suffix, char const
 	} else {
     pajek_append_mode=append;
 	}
+  pajek_init_KindsOfRelation_check=true; //Enable initialisation of kinds of rel.
   pajek_clear();
   pajek_vertice_xy_pos_numb = -1; /* Not yet analysed */
   pajek_time=0;
@@ -1033,6 +1040,12 @@ bool pajek_timeline_close(){
   while(std::getline(pajek_file_in,str)){
  		pajek_file<<str<<endl;
 	}
+  /*
+    The following two lines set getline back to the start. 
+    See: http://stackoverflow.com/a/5343199
+  */
+  pajek_file_in.clear();
+  pajek_file_in.seekg (0, ios::beg);
 
 	/* Close files and delete old pajek file */
 	pajek_file.close();

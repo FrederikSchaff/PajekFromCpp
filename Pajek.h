@@ -205,6 +205,7 @@ bool pajek_openFile( bool append, int serial, int time=-1);
 bool pajek_close( bool final=false, bool append=false);
 bool pajek_partial_snaps( bool renew);
 
+bool pajek_init_KindsOfRelation_check=false; //Make sure that pajek is first initialised, resetting the counters.
 bool pajek_init_KindsOfRelation( char const *relation, bool isedge);
 
 char const *pajek_shape( int shape=0);
