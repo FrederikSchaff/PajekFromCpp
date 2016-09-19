@@ -350,13 +350,13 @@ bool pajek_append (int time, bool final )
 		}
 
     if (PAJEK_FORCE_COMPLETE){
-    	id=i+1;
+      id=pajek_Unique2Consequtive[pajek_vertices_ID[i]]; //ensures "sorted" IDs 	
       if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
       	return false;
 			}
-		} else {
-			id=pajek_vertices_ID[i];
-		}
+		} else{
+      id=pajek_vertices_ID[i]; //The vertices may not be sorted by id.
+    }
 
 		snprintf(	pajek_buffer,sizeof(char)*196, \
 						"  %i \"%s\" %g %g %g %s x_fact %g y_fact %g ic %s", \
