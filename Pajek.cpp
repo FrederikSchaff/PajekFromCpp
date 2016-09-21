@@ -351,7 +351,7 @@ bool pajek_append (int time, bool final )
 
     if (PAJEK_FORCE_COMPLETE){
       id=pajek_Unique2Consequtive[pajek_vertices_ID[i]]; //ensures "sorted" IDs 	
-      if(!pajek_vertices_timeline_add(pajek_vertices_ID[i], pajek_vertices_label[i], pajek_snapshot_count)){
+      if(!pajek_vertices_timeline_add(id, pajek_vertices_label[i], pajek_snapshot_count)){
       	return false;
 			}
 		} else{
@@ -426,7 +426,7 @@ bool pajek_append (int time, bool final )
           if (PAJEK_FORCE_COMPLETE){
           	source = pajek_Unique2Consequtive[pajek_arcs_source[i]];
 						target = pajek_Unique2Consequtive[pajek_arcs_target[i]];
-           	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
+           	if (!pajek_arcs_timeline_add(source, target, pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
 							return false;
 						}
 					} else {
@@ -513,7 +513,7 @@ bool pajek_append (int time, bool final )
         	if (PAJEK_FORCE_COMPLETE){
           	source = pajek_Unique2Consequtive[pajek_arcs_source[i]];
 						target = pajek_Unique2Consequtive[pajek_arcs_target[i]];
-           	if (!pajek_arcs_timeline_add(pajek_arcs_source[i], pajek_arcs_target[i], pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
+           	if (!pajek_arcs_timeline_add(source, target, pajek_arcs_label[i], pajek_snapshot_count, pajek_arcs_isEdge[i])){
             	return false;
 						}
 					} else {

@@ -103,8 +103,7 @@
 	#if defined(_WIN32)
 		#define NEW_DIR(str) _mkdir(str)
 	#else
-		#define NEW_DIR(str) void()
-		//mkdir(str, 0777);
+		#define NEW_DIR(str) mkdir(str, 0777);
 	#endif
 #endif
 
