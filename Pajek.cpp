@@ -76,7 +76,7 @@ bool pajek_arcs_add(bool isedge, int source, int target, double value, char cons
 /* Add kinds of relation for a multiple edge/arc network.*/
 bool pajek_init_KindsOfRelation(char const *relation, bool isedge)
 {
-  if (pajek_init_KindsOfRelation_check){
+  if (pajek_init_KindsOfRelation_check || pajek_edges_kindsOf_count>0 || pajek_arcs_kindsOf_count>0){
     if (max(pajek_arcs_kindsOf_count,pajek_edges_kindsOf_count)< PAJEK_KINDS_RELATIONS){
   		if (isedge) {
         snprintf(pajek_edges_kindsOf[pajek_edges_kindsOf_count],sizeof(char)*PAJEK_LABELSIZE,"%s",relation);
