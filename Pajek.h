@@ -7,27 +7,40 @@
 /*   Format used here is that for pajekToSvgAnim package                      */
 /*                                                                            */
 /*   Originally created to use with LSD. Only tested with LSD on windows.     */
-/*															(https://github.com/marcov64/Lsd)             */
+/*              (https://github.com/marcov64/Lsd)                             */
 /*                                                                            */
 /*   1) Errors and Infos are printed to the output defined as                 */
-/*			PAJEK_MSG(pajek_msg)  if provided. Else nothing is printed.           */
+/*      PAJEK_MSG(pajek_msg)  if provided. Else nothing is printed.           */
+/*                                                                            */
+/*      There are two modes available: single snapshot mode and append mode:  */
+/*          single snapshot mode: Each snapshot is saved in a single .net     */
+/*          append mode:                                                      */
+/*          I) A (set of) *.paj files is created, holding all the             */
+/*            snapshots. Via #define PAJEK_MAX_SNAPSHOTS the number of snap-  */
+/*            shots per file *_part*.pay is defined. (default 200)            */
+/*          II)ALTERNATIVELY, if PAJEK_FORCE_COMPLETE is def true (default)   */
+/*            a single *.paj file is created holding all snapshots and at the */
+/*            beginning of this file a special snapshot is created, holding   */
+/*            all the time-line information, thus making it suitable to work  */
+/*            with e.g. PajekToSvgAnim                                        */
+/*                                                                            */
 /*  2a)Initialise a new network via pajek_init()                              */
 /*   b)Add different kinds of arcs/edges if wanted via                        */
 /*    Pajek_init_KindsOfRelations() (after pajek_init() ).                    */
 /*   c)Each time you add arcs, edges or vertices use the according commands   */
-/*	 d)At the end of a time-period, use the command pajek_snapshot(t).        */
+/*   d)At the end of a time-period, use the command pajek_snapshot(t).        */
 /*      or - in case you do not want to save this period - use pajek_clear()  */
-/*	 e)At the end of the simulation, use the pajek_snapshot(t,final) command. */
+/*   e)At the end of the simulation, use the pajek_snapshot(t,final) command. */
 /*                                                                            */
 /* 3) if no "time" is provided, it is started with time = 1 and time is       */
-/*		automatically increased at each snappshot. One may create "initiale"    */
-/*		data with an additional call using pajek_snapshot() with time=0.        */
-/*		If no "serial" is provided, the first pajek_ini sets it to one and it is*/
-/*		increased afterwards by one, each time a new initialisation is done.    */
+/*    automatically increased at each snappshot. One may create "initiale"    */
+/*    data with an additional call using pajek_snapshot() with time=0.        */
+/*    If no "serial" is provided, the first pajek_ini sets it to one and it is*/
+/*    increased afterwards by one, each time a new initialisation is done.    */
 /*                                                                            */
 /*                                                                            */
 /*   See the description of the #defines here and the pajek_ functions in the */
-/* 	 accompanying .cpp file for more information.                             */
+/*   accompanying .cpp file for more information.                             */
 /*   Note: Not all functionality is documented here (yet)                     */
 /* ========================================================================== */
 
