@@ -110,6 +110,17 @@
 		#define PAJEK_SNAPSHOTS_PER_FILE 100
 #endif
 
+/* pajek_relative_xy(), defaults */
+#ifndef PAJEK_RELATIVE_XY_X_ORIG
+  #define PAJEK_RELATIVE_XY_X_ORIG 0.5
+#endif
+#ifndef PAJEK_RELATIVE_XY_Y_ORIG
+  #define PAJEK_RELATIVE_XY_Y_ORIG 0.5
+#endif   
+#ifndef PAJEK_RELATIVE_XY_RADIUS
+  #define PAJEK_RELATIVE_XY_RADIUS 0.5
+#endif
+
 /* Create Directory -- currently only working in linux (not tested) and
 	win32 (tested) but NOT win64(not tested) with cygwin64 */
 #ifndef NEW_DIR
@@ -221,7 +232,7 @@ bool pajek_init_KindsOfRelation_check=false; //Make sure that pajek is first ini
 bool pajek_init_KindsOfRelation( char const *relation, bool isedge);
 
 char const *pajek_shape( int shape=0);
-bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius=.5, double x_orig=.5, double y_orig=.5);
+bool pajek_relative_xy(double tau, double *pos_x,double *pos_y, double radius=PAJEK_RELATIVE_XY_RADIUS, double x_orig=PAJEK_RELATIVE_XY_X_ORIG, double y_orig=PAJEK_RELATIVE_XY_Y_ORIG);
 
 bool pajek_init_timeline();
 bool pajek_vertices_timeline_add(int ID, char const *label, int snapshot);
