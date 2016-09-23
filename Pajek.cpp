@@ -1038,14 +1038,14 @@ bool pajek_timeline_close(){
 
 	std::string str;
   while(std::getline(pajek_file_in,str)){
- 		pajek_file<<str<<endl;
+ 		pajek_file<<str<<std::endl;
 	}
   /*
     The following two lines set getline back to the start. 
     See: http://stackoverflow.com/a/5343199
   */
   pajek_file_in.clear();
-  pajek_file_in.seekg (0, ios::beg);
+  pajek_file_in.seekg (0, std::ios::beg);
 
 	/* Close files and delete old pajek file */
 	pajek_file.close();
