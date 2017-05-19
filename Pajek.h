@@ -54,6 +54,7 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
+#include <direct.h>
 
 /* Error and other msg's output */
 #ifndef PAJEK_MSG
