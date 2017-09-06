@@ -1097,8 +1097,7 @@ int pajek_consistent_IDs(){
 		accessed for the position of the single vertices direcly, or (prefered)
 		via the functions pajek_vertice_x_pos and pajek_vertice_y_pos
 */
-double pajek_partition_unitSquare(int numb, \
-									 double orig_x, double orig_y, double orig_size){
+double pajek_partition_unitSquare(int numb, double orig_x, double orig_y, double orig_size){
 
 	/* Set the number of seperate vertices that shall be present */
   pajek_vertice_xy_pos_numb=numb;
