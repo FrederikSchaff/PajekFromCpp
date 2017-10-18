@@ -149,9 +149,9 @@ bool pajek_openFile(bool append, int serial, int time)
 			FOLDERSEP2(pajek_dirname, pajek_dirname_suffix) \
 			,pajek_dirname_suffix);
 	if (pajek_dirname[0]!='\0')
-		NEW_DIR(pajek_dirname);
+		makePath(pajek_dirname);
 	if (pajek_dirname_suffix[0]!='\0'){
-    NEW_DIR(pajek_dir_path);
+    makePath(pajek_dir_path);
 	}
 
 

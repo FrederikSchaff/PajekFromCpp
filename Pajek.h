@@ -54,11 +54,17 @@
 #include <fstream>
 #include <string>
 #include <cstdio>
-#include <direct.h>
+
+
+#include "CreateDir.h" //to create dirs
 
 /* Error and other msg's output */
 #ifndef PAJEK_MSG
-	#define PAJEK_MSG(MSG) void() /* Provide some way to channel the msgs! */
+  #ifdef MODELBEGIN
+    #define PAJEK_MSG(MSG) plog(MSG) //USE LSD plog
+  #else
+	 #define PAJEK_MSG(MSG) void() /* Provide some way to channel the msgs! */
+  #endif
 #endif
 
 #ifndef PAJEK_MAX_VERTICES
@@ -120,16 +126,6 @@
 #endif   
 #ifndef PAJEK_RELATIVE_XY_RADIUS
   #define PAJEK_RELATIVE_XY_RADIUS 0.5
-#endif
-
-/* Create Directory -- currently only working in linux (not tested) and
-	win32 (tested) but NOT win64(not tested) with cygwin64 */
-#ifndef NEW_DIR
-	#if defined(_WIN32)
-		#define NEW_DIR(str) _mkdir(str)
-	#else
-		#define NEW_DIR(str) mkdir(str, 0777);
-	#endif
 #endif
 
 /* from equal named LSD command */
