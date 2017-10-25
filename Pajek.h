@@ -61,7 +61,7 @@
 /* Error and other msg's output */
 #ifndef PAJEK_MSG
   #ifdef MODELBEGIN
-    #define PAJEK_MSG(MSG) plog(MSG) //USE LSD plog
+    #define PAJEK_MSG(MSG) PLOG(MSG) //USE LSD PLOG
   #else
 	 #define PAJEK_MSG(MSG) void() /* Provide some way to channel the msgs! */
   #endif
