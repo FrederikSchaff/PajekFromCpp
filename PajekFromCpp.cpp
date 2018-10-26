@@ -2,7 +2,7 @@
 
   This is a completely rewritten version. Thx to Kyaw Oo for help.
 
-  For more information on Pajek, etc., see the other (depreciated) files.
+  For more information on Pajek, etc., see PajekFromCpp_macro.h
   The info will move here later.
 
   Copyright: Frederik Schaff, Ruhr-University Bochum
@@ -463,7 +463,7 @@ struct TimeSnap{
 class Pajek{
 
   //file will be saved in parent_folder / set_name / set_name _ set_id .paj
-
+  bool paj_error_hard = false;
   std::string parent_folder   = "Networks"; //information of the parentfolder, relative to the program dir
   std::string set_name        = "MyNet";
   int set_id                  = 0; //the id is integer number - e.g. the seed.
@@ -581,7 +581,7 @@ public:
 
     void clear() //clear everything for a new initialisation
     {
-
+    paj_error_hard      = false;
     parent_folder   = "Networks"; //information of the parentfolder, relative to the program dir
     set_name        = "MyNet";
     set_id          = 0; //the id is integer number - e.g. the seed.
@@ -609,6 +609,8 @@ public:
 
     void init(std::string _parent_folder, std::string _set_name, int _set_id, std::string _network_name, bool _forPajekToSVGAnim=false, bool _staticNetMode=false)
     {
+      if ( paj_error_hard )
+        return;
       if ( initialised == true ){
         clear();
       }
@@ -709,6 +711,8 @@ public:
  	void add_vertice(int time,int ID,std::string kind,double value,
 						double cor_X,double cor_Y,std::string shape, double x_fact,double y_fact, std::string color,std::string label="")
 	{
+    if ( paj_error_hard )
+      return;
 //     std::cout << "Called add_vertice: time " << time << ", ID " << ID << ", kind " << kind << ", value " << value << " ... label " << label << std::endl;
 		if (time>cur_time ) //new time-snap
 		{		
@@ -719,6 +723,7 @@ public:
 		else if (time<cur_time) //error
 		{
 			std::cout<<"ERROR: time error"<<std::endl;
+        paj_error_hard = true;
 			return;
 		}
     update_max_x_y(cor_X>cor_Y?cor_X:cor_Y); // info for the norming
@@ -747,6 +752,8 @@ void add_relation(int time, int source_ID, std::string source_kind,
                   int target_ID , std::string target_kind, bool isEdge, std::string relation,
                   double value, double width ,std::string color)
 	{
+    if ( paj_error_hard )
+      return;
 //     std::cout << "Called add_relation: time " << time << ", source ID " << source_ID << ", source kind " << source_kind
 //     std::cout << ", target ID " << target_ID << ", target kind " << target_kind << (isEdge?", (Edge) ":",(Arc) ") << ", relation" << relation << ", value " << value << " ... " << std::endl;
     ID_kind source(source_ID,source_kind);
@@ -875,14 +882,18 @@ void add_relation(int time, int source_ID, std::string source_kind,
 
   void save_to_file()
   {
+    if ( paj_error_hard )
+      return;
 
       //create and open file
     if (makePath(parent_folder.c_str()) == false){
       std::cout << "Error! Could not create parent folder: " << parent_folder;
+        paj_error_hard = true;
     }
     std::string target_dir = parent_folder + "/" + set_name;
     if (makePath(target_dir.c_str()) == false ){
       std::cout << "Error! Could not create target folder: " << target_dir;
+        paj_error_hard = true;
     }
     std::string filetype = ".paj";
     if (staticNetMode == true) {
@@ -893,14 +904,13 @@ void add_relation(int time, int source_ID, std::string source_kind,
     pajek_file.open(filename,std::ios_base::out | std::ios_base::trunc);
     if (pajek_file.is_open() == false){
       std::cout << "Error! Could not open output file: " << filename;
+        paj_error_hard = true;
     }
 
       //change some content - this can be more efficient if we make the structs members of Pajek
 
     norm_coords();
     norm_id_label_length();
-
-    //In case of the static mode, we need to update some information first-
 
       //write content to file
 
@@ -918,6 +928,7 @@ void add_relation(int time, int source_ID, std::string source_kind,
     pajek_file.close();
     if (pajek_file.is_open() == true){
       std::cout << "Error! Could not close output file: " << filename;
+        paj_error_hard = true;
     }
   }
 
