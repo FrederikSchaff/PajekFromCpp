@@ -37,7 +37,7 @@ inline double rel_pos(double rank, double ranks){
 
 inline std::string uniqueID2string (const int ID,const int n_decimals){
     return std::string(n_decimals - std::to_string(ID).length(), ' ') + std::to_string(ID);
-};
+}
 
 struct SourceTargetUnique{
 
@@ -77,7 +77,7 @@ struct ID_kind {
       if (add_zeros>=0) {
         t_label = kind + "_" + std::string(add_zeros, '0') + t_label;
       } else if (add_zeros<0)  { //else: exception..
-        std::cout << "Error! Exception at ID_kind.get_label() - add_zeros < 0";
+        std::cout << "\nPAJEKFROMCPP Error! Exception at ID_kind.get_label() - add_zeros < 0";
       }
       return t_label;
     } else {
@@ -231,7 +231,7 @@ struct Vertice{
     if (add_space > 0) {
       temp_label = temp_label + std::string(add_space, ' ');
     } else if (add_space<0)  { //else: exception..
-      std::cout << "Error! Exception at Vertice.as_string() - add_space <0";
+      std::cout << "\nPAJEKFROMCPP Error! Exception at Vertice.as_string() - add_space <0";
     }
       std::pair <std::string,std::string> paired_attributes = attributes.as_string();
     return std::make_pair <std::string,std::string>(" " + uniqueID2string(unique_ID, n_unique_decimals) + " " + temp_label \
@@ -329,7 +329,7 @@ struct TimeSnap{
         return ver.unique_ID;
       }
     }
-    std::cout << "Error in get_unique_ID: The vertice does not exist." << std::endl;
+    std::cout << "\nPAJEKFROMCPP Error! Error in get_unique_ID: The vertice does not exist." << std::endl;
     return -1; //error!
   }
 
@@ -359,11 +359,11 @@ struct TimeSnap{
 
     #ifdef PAJEK_CONSISTENCY_CHECK_ON
     		if (is_exist_Vertice(unique_relation.source)==false || is_exist_Vertice(unique_relation.target)==false ){
-          std::cout<<"PAJEK_CONSISTENCY_CHECK: relation not added. source or target not existent."<<std::endl;
+          std::cout<<"\nPAJEK_CONSISTENCY_CHECK: relation not added. source or target not existent."<<std::endl;
           return false;
         //-4. consistency check: does the exact relation exist?
         } else if(is_exist_Relation(unique_relation)==true){
-          std::cout<<"PAJEK_CONSISTENCY_CHECK: existing relation "<<std::endl;
+          std::cout<<"\nPAJEK_CONSISTENCY_CHECK: existing relation "<<std::endl;
           return false;
     		}
     #endif
@@ -379,7 +379,7 @@ struct TimeSnap{
     #ifdef PAJEK_CONSISTENCY_CHECK_ON  //to check for consistency, optional
   		if (is_exist_Vertice(id_kind)==true)
   		{
-      			std::cout<<"PAJEK_CONSISTENCY_CHECK: vertice exists already" <<std::endl;
+      			std::cout<<"\nPAJEK_CONSISTENCY_CHECK: vertice exists already" <<std::endl;
             return false;
       }
     #endif
@@ -722,7 +722,7 @@ public:
     //consistency check 1
 		else if (time<cur_time) //error
 		{
-			std::cout<<"ERROR: time error"<<std::endl;
+			std::cout<<"\nPAJEKFROMCPP Error!: time error"<<std::endl;
         paj_error_hard = true;
 			return;
 		}
@@ -771,11 +771,11 @@ void add_relation(int time, int source_ID, std::string source_kind,
   			if (rel.first==relation){
   				rel_exists =true;
   				if (rel.second==isEdge){
-//   					std::cout<<"PAJEK_CONSISTENCY_CHECK: relation is present and correct"<<std::endl;
+//   					std::cout<<"\nPAJEK_CONSISTENCY_CHECK: relation is present and correct"<<std::endl;
   					break;
   				}
   				else {
-  					std::cout<<"PAJEK_CONSISTENCY_CHECK: error: relation alreay present but different"<<std::endl;
+  					std::cout<<"\nPAJEK_CONSISTENCY_CHECK: error: relation alreay present but different"<<std::endl;
   					return;
   				}
   			}
@@ -803,7 +803,7 @@ void add_relation(int time, int source_ID, std::string source_kind,
     //2. Consistency check: time as arrow?
 		else if (time<cur_time) //error
 		{
-			std::cout<<"PAJEK_CONSISTENCY_CHECK: time error at add relation cur time is"<<cur_time<<std::endl;
+			std::cout<<"\nPAJEK_CONSISTENCY_CHECK: time error at add relation cur time is"<<cur_time<<std::endl;
 			return;
 		}
 #endif
@@ -887,12 +887,12 @@ void add_relation(int time, int source_ID, std::string source_kind,
 
       //create and open file
     if (makePath(parent_folder.c_str()) == false){
-      std::cout << "Error! Could not create parent folder: " << parent_folder;
+      std::cout << "\nPAJEKFROMCPP Error! Could not create parent folder: " << parent_folder;
         paj_error_hard = true;
     }
     std::string target_dir = parent_folder + "/" + set_name;
     if (makePath(target_dir.c_str()) == false ){
-      std::cout << "Error! Could not create target folder: " << target_dir;
+      std::cout << "\nPAJEKFROMCPP Error! Could not create target folder: " << target_dir;
         paj_error_hard = true;
     }
     std::string filetype = ".paj";
@@ -903,7 +903,7 @@ void add_relation(int time, int source_ID, std::string source_kind,
     std::ofstream pajek_file;
     pajek_file.open(filename,std::ios_base::out | std::ios_base::trunc);
     if (pajek_file.is_open() == false){
-      std::cout << "Error! Could not open output file: " << filename;
+      std::cout << "\nPAJEKFROMCPP Error! Could not open output file: " << filename;
         paj_error_hard = true;
     }
 
@@ -927,7 +927,7 @@ void add_relation(int time, int source_ID, std::string source_kind,
       //close file
     pajek_file.close();
     if (pajek_file.is_open() == true){
-      std::cout << "Error! Could not close output file: " << filename;
+      std::cout << "\nPAJEKFROMCPP Error! Could not close output file: " << filename;
         paj_error_hard = true;
     }
   }

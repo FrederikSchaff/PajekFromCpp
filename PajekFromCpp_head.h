@@ -10,5 +10,5 @@
 
 #include "PajekFromCpp.cpp"
 #include "PajekFromCpp_macro.h"
-PAJ_MAKE_AVAILABLE;
+PAJ_MAKE_AVAILABLE
 
