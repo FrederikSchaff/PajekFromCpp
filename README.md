@@ -20,7 +20,7 @@ See the PajekFromCpp_test.cpp file for a use-case example. Take a look at PajekF
 *If somebody produces a better test model, please let me know so I can add it instead!*
 
 ### Misc
-The code is provided "as is". You may reach out to the author via E-Mail at: [frederik.schaff@fernuni-hagen.de](frederik.schaff@fernuni-hagen.de)
+The code is provided "as is". You may reach out to the author via E-Mail at: [frederik.schaff@rub.de](frederik.schaff@rub.de)
 
 For further information on Pajek see also:
 
