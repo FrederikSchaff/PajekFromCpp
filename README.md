@@ -2,6 +2,8 @@
 
 Complete rework 10/2018
 
+**Version 0.1** (as of 01/2019)
+
 Stand alone c++ source code to create pajek .net and .paj (including timeline feature for PajekToScgAnim) files from any simulation in c/c++. For the documentation (how to) see the PajekFromCpp_macro.h file. The macros are intended as API, but in general you only need to include PajekFromCpp.cpp.
 
 The additional file "CreateDir.h" provides capbabilities to create directories on linux and windows machines.
@@ -29,3 +31,7 @@ networks with program package Pajek. In: Complex Adaptive Systems Modeling 4(1),
 Nooy, Wouter de; Mrvar, Andrej; Batagelj, Vladimir (2011): Exploratory social
 network analysis with Pajek. Rev. and expanded 2nd ed. England, New York:
 Cambridge University Press (Structural analysis in the social sciences, 34).
+
+### License  
+
+The code is distributed under the MIT license, see the attached license file.
