@@ -1,4 +1,4 @@
-# PajekFromCpp
+# PajekFromCpp [![DOI](https://zenodo.org/badge/64066594.svg)](https://zenodo.org/badge/latestdoi/64066594)
 
 Complete rework 10/2018
 
